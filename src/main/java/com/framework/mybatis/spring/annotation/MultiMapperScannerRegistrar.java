@@ -103,7 +103,7 @@ public class MultiMapperScannerRegistrar implements ImportBeanDefinitionRegistra
         if (StringUtils.hasText(properties)) {
             String apps = this.environment.getProperty(properties + ".apps");
             if (StringUtils.hasText(apps)) {
-                builder.addPropertyValue("apps", apps.replace(" ", ""));
+                builder.addPropertyValue("apps", apps);
             }
         }
         builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(basePackages));

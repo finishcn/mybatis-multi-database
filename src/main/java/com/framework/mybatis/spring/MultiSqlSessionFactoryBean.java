@@ -1,6 +1,8 @@
 package com.framework.mybatis.spring;
 
+import com.framework.autoconfigure.jdbc.MultiDataSourceProperties;
 import com.framework.mybatis.builder.MultiXMLMapperBuilder;
+import com.framework.mybatis.xmltags.MultiXMLLanguageDriver;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.cache.Cache;
@@ -24,6 +26,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.json.YamlJsonParser;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -37,7 +40,6 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -70,7 +72,7 @@ public class MultiSqlSessionFactoryBean
 
     private Configuration configuration;
 
-    private Resource[] mapperLocations;
+    private List<Resource> mapperLocations;
 
     private DataSource dataSource;
 
@@ -104,7 +106,7 @@ public class MultiSqlSessionFactoryBean
 
     private LanguageDriver[] scriptingLanguageDrivers;
 
-    private Class<? extends LanguageDriver> defaultScriptingLanguageDriver;
+    private Class<? extends LanguageDriver> defaultScriptingLanguageDriver = MultiXMLLanguageDriver.class;
 
     private DatabaseIdProvider databaseIdProvider;
 
@@ -116,7 +118,15 @@ public class MultiSqlSessionFactoryBean
 
     private ObjectWrapperFactory objectWrapperFactory;
 
-    private final Map<String, String> apps = new HashMap<>();
+    private Map<String, Object> apps = new HashMap<String, Object>();
+
+    public MultiSqlSessionFactoryBean() {
+    }
+
+    public MultiSqlSessionFactoryBean(MultiDataSourceProperties dataSourceProperties) throws IOException {
+        this.setApps(dataSourceProperties.getApps());
+        this.setMapperLocations(dataSourceProperties.getMapperLocations());
+    }
 
     public void setObjectFactory(ObjectFactory objectFactory) {
         this.objectFactory = objectFactory;
@@ -191,8 +201,16 @@ public class MultiSqlSessionFactoryBean
         this.configuration = configuration;
     }
 
-    public void setMapperLocations(Resource... mapperLocations) {
-        this.mapperLocations = mapperLocations;
+    public void setMapperLocations(String... resourcePath) throws IOException {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        List<Resource> list = new ArrayList<>();
+        for (String path : resourcePath) {
+            Resource[] msresources = resolver.getResources(path);
+            for (Resource resource : msresources) {
+                list.add(resource);
+            }
+        }
+        this.mapperLocations = list;
     }
 
     public void setConfigurationProperties(Properties sqlSessionFactoryProperties) {
@@ -228,15 +246,7 @@ public class MultiSqlSessionFactoryBean
     }
 
     public void setApps(String apps) {
-        if (StringUtils.hasText(apps)) {
-            String[] arrs = apps.replace(" ", "").toLowerCase().split("--");
-            for (String info : arrs) {
-                String[] app = info.split(":");
-                if (app[1] != null && !app[1].isEmpty() && !"null".equals(app[1])) {
-                    this.apps.put(app[0], app[1]);
-                }
-            }
-        }
+        this.apps.putAll(new YamlJsonParser().parseMap(apps));
     }
 
     @Override
@@ -342,7 +352,7 @@ public class MultiSqlSessionFactoryBean
                 this.dataSource));
 
         if (this.mapperLocations != null) {
-            if (this.mapperLocations.length == 0) {
+            if (this.mapperLocations.size() == 0) {
                 LOGGER.warn(() -> "Property 'mapperLocations' was specified but matching resources are not found.");
             } else {
                 for (Resource mapperLocation : this.mapperLocations) {
@@ -351,7 +361,7 @@ public class MultiSqlSessionFactoryBean
                     }
                     String mapperName = mapperLocation.getFilename();
                     if (mapperName.toLowerCase().startsWith("multi")) {
-                        for (Map.Entry<String, String> appinfp : this.apps.entrySet()) {
+                        for (Map.Entry<String, Object> appinfp : this.apps.entrySet()) {
                             //app信息
                             String name = appinfp.getKey();
                             targetConfiguration.getVariables().put("app", name);

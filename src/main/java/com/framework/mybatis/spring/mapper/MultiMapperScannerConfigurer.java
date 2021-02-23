@@ -16,6 +16,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.json.YamlJsonParser;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -166,12 +167,8 @@ public class MultiMapperScannerConfigurer implements BeanDefinitionRegistryPostP
         scanner.setBeanNameGenerator(this.nameGenerator);
         scanner.setMapperFactoryBeanClass(this.mapperFactoryBeanClass);
         if (StringUtils.hasText(this.apps)) {
-            String[] list = this.apps.split("--");
-            for (int i = 0; i < list.length; ++i) {
-                String app = list[i];
-                list[i] = app.substring(0, app.indexOf(":"));
-            }
-            scanner.setApps(list);
+            Map<String, Object> map = new YamlJsonParser().parseMap(apps);
+            scanner.setApps(map.keySet());
         }
         if (StringUtils.hasText(lazyInitialization)) {
             scanner.setLazyInitialization(Boolean.parseBoolean(lazyInitialization));

@@ -65,6 +65,8 @@ public class MultiDataSourceProperties implements BeanClassLoaderAware, Initiali
 
     private String apps;
 
+    private String mapperLocations;
+
     private EmbeddedDatabaseConnection embeddedDatabaseConnection = EmbeddedDatabaseConnection.NONE;
 
     private MultiDataSourceProperties.Xa xa = new MultiDataSourceProperties.Xa();
@@ -320,6 +322,14 @@ public class MultiDataSourceProperties implements BeanClassLoaderAware, Initiali
 
     public ClassLoader getClassLoader() {
         return this.classLoader;
+    }
+
+    public String[] getMapperLocations() {
+        return mapperLocations.split(",");
+    }
+
+    public void setMapperLocations(String mapperLocations) {
+        this.mapperLocations = mapperLocations;
     }
 
     public MultiDataSourceProperties.Xa getXa() {

@@ -1,5 +1,6 @@
 package com.framework.mybatis.builder;
 
+import com.framework.autoconfigure.jdbc.MultiConfiguration;
 import org.apache.ibatis.builder.*;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.builder.xml.XMLStatementBuilder;
@@ -24,7 +25,6 @@ public class MultiXMLMapperBuilder extends BaseBuilder {
     private final MapperBuilderAssistant builderAssistant;
     private final Map<String, XNode> sqlFragments;
     private final String resource;
-    private String app;
 
     @Deprecated
     public MultiXMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
@@ -79,8 +79,8 @@ public class MultiXMLMapperBuilder extends BaseBuilder {
                 throw new BuilderException("Mapper's namespace cannot be empty");
             }
             String app = this.configuration.getVariables().getProperty("app");
-            namespace = namespace.substring(0, namespace.lastIndexOf(".") + 1)
-                    + app.substring(0, 1).toUpperCase() + app.substring(1) + namespace.substring(namespace.lastIndexOf(".") + 6);
+            String beaNname = app + namespace.substring(namespace.lastIndexOf(".") + 6);
+            namespace = MultiConfiguration.getMapperClass(beaNname, namespace).getName();
             builderAssistant.setCurrentNamespace(namespace);
             cacheRefElement(context.evalNode("cache-ref"));
             cacheElement(context.evalNode("cache"));
@@ -406,13 +406,5 @@ public class MultiXMLMapperBuilder extends BaseBuilder {
                 configuration.addMapper(boundType);
             }
         }
-    }
-
-    public String getApp() {
-        return app;
-    }
-
-    public void setApp(String app) {
-        this.app = app;
     }
 }

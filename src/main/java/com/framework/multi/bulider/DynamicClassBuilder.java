@@ -19,17 +19,18 @@ public class DynamicClassBuilder {
     /**
      * 创建mapper类字符串
      */
-    public static Class<?> createMapperClass(DynamicClassLoader classLoader, String className, String baseMapperClass) throws Exception {
-        String pg = baseMapperClass.substring(0, baseMapperClass.lastIndexOf("."));
-        String classString = "package " + pg + "; public interface " + className + " extends " + baseMapperClass + "{}";
-        return createClass(classLoader, pg + "." + className, classString);
+    public static Class<?> createMapperClass(String className, String baseMapperName) throws Exception {
+        String pg = baseMapperName.substring(0, baseMapperName.lastIndexOf("."));
+        String classString = "package " + pg + "; public interface " + className + "{}";
+        return createClass(pg + "." + className, classString);
     }
 
     /**
      * 创建类class
      */
-    public static Class<?> createClass(DynamicClassLoader classLoader, String className, String classString) throws Exception {
+    public static Class<?> createClass(String className, String classString) throws Exception {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        DynamicClassLoader classLoader = DynamicClassLoader.getClassLoader();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
         DynamicClassLoader.ClassJavaFileManager classJavaFileManager = new DynamicClassLoader.ClassJavaFileManager(standardFileManager);
         DynamicClassLoader.StringObject stringObject = new DynamicClassLoader.StringObject(

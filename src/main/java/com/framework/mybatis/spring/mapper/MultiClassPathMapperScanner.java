@@ -1,7 +1,6 @@
 package com.framework.mybatis.spring.mapper;
 
-import com.framework.multi.bulider.DynamicClassBuilder;
-import com.framework.multi.loader.DynamicClassLoader;
+import com.framework.autoconfigure.jdbc.MultiConfiguration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.logging.Logger;
 import org.mybatis.logging.LoggerFactory;
@@ -52,7 +51,7 @@ public class MultiClassPathMapperScanner extends ClassPathBeanDefinitionScanner 
 
     private BeanDefinitionRegistry registry;
 
-    private String[] apps;
+    private Set<String> apps;
 
     private Class<? extends MapperFactoryBean> mapperFactoryBeanClass = MapperFactoryBean.class;
 
@@ -93,11 +92,11 @@ public class MultiClassPathMapperScanner extends ClassPathBeanDefinitionScanner 
         this.sqlSessionFactoryBeanName = sqlSessionFactoryBeanName;
     }
 
-    public String[] getApps() {
+    public Set<String> getApps() {
         return apps;
     }
 
-    public void setApps(String[] apps) {
+    public void setApps(Set<String> apps) {
         this.apps = apps;
     }
 
@@ -146,10 +145,9 @@ public class MultiClassPathMapperScanner extends ClassPathBeanDefinitionScanner 
     public Set<BeanDefinitionHolder> doScan(String... basePackages) {
         Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
         try {
-            DynamicClassLoader classLoader = new DynamicClassLoader();
             for (BeanDefinitionHolder baseholder : beanDefinitions) {
                 if (baseholder.getBeanName().startsWith("multi")) {
-                    processMultiBeanDefinitions(classLoader, baseholder);
+                    processMultiBeanDefinitions(baseholder);
                 } else {
                     processBeanDefinitions(baseholder);
                 }
@@ -179,25 +177,24 @@ public class MultiClassPathMapperScanner extends ClassPathBeanDefinitionScanner 
     /**
      * 多实例配置
      */
-    private void processMultiBeanDefinitions(DynamicClassLoader classLoader, BeanDefinitionHolder baseholder) throws Exception {
+    private void processMultiBeanDefinitions(BeanDefinitionHolder baseholder) throws Exception {
         String baseBeanName = baseholder.getBeanName();
-        //移除基础bean定义
         this.registry.removeBeanDefinition(baseBeanName);
+        //移除基础bean定义
         baseBeanName = baseBeanName.substring(5);
         GenericBeanDefinition baseDefinition = (GenericBeanDefinition) baseholder.getBeanDefinition();
-        String baseBeanClassName = baseDefinition.getBeanClassName();
+        String baseClassName = baseDefinition.getBeanClassName();
         for (String app : apps) {
             //创建新bean
-            String className = app.substring(0, 1).toUpperCase() + app.substring(1) + baseBeanName;
-            String beanName = app + baseBeanName;
-            Class clz = DynamicClassBuilder.createMapperClass(classLoader, className, baseBeanClassName);
-            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(clz);
+            String baseName = app + baseBeanName;
+            Class mapperClass = MultiConfiguration.getMapperClass(baseName, baseClassName);
+            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(mapperClass);
             AbstractBeanDefinition definition = builder.getBeanDefinition();
             // 原mybatis代码
-            definition.getConstructorArgumentValues().addGenericArgumentValue(clz);
+            definition.getConstructorArgumentValues().addGenericArgumentValue(mapperClass);
             definition.setBeanClass(this.mapperFactoryBeanClass);
             processBeanDefinitions(definition);
-            registry.registerBeanDefinition(beanName, definition);
+            registry.registerBeanDefinition(baseName, definition);
         }
     }
 

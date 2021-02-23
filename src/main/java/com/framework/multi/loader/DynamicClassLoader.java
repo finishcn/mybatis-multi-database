@@ -14,13 +14,25 @@ public class DynamicClassLoader extends ClassLoader {
 
     private byte[] bytes;
 
+    private volatile static DynamicClassLoader loader;
+
+    private DynamicClassLoader() {
+    }
+
+    public static DynamicClassLoader getClassLoader() {
+        if (null == loader) {
+            synchronized (DynamicClassLoader.class) {
+                if (null == loader) {
+                    loader = new DynamicClassLoader();
+                }
+            }
+        }
+        return loader;
+    }
+
     @Override
     protected Class<?> findClass(String name) {
         return defineClass(name, bytes, 0, bytes.length);
-    }
-
-    public byte[] getBytes() {
-        return bytes;
     }
 
     public void setBytes(byte[] bytes) {
