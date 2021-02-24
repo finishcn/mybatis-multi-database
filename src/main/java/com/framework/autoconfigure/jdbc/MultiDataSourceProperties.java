@@ -3,6 +3,7 @@ package com.framework.autoconfigure.jdbc;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.jdbc.DataSourceInitializationMode;
 import org.springframework.boot.jdbc.DatabaseDriver;
@@ -23,7 +24,10 @@ import java.util.UUID;
  *
  * @author liyi
  */
+@ConfigurationProperties(prefix = MultiDataSourceProperties.MYBATIS_MULTI_PREFIX)
 public class MultiDataSourceProperties implements BeanClassLoaderAware, InitializingBean {
+
+    public static final String MYBATIS_MULTI_PREFIX = "spring.multidatasource";
 
     private ClassLoader classLoader;
 
