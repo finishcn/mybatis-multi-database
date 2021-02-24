@@ -118,7 +118,7 @@ public class MultiSqlSessionFactoryBean
 
     private ObjectWrapperFactory objectWrapperFactory;
 
-    private Map<String, Object> apps = new HashMap<String, Object>();
+    private Map<String, Object> apps = new HashMap<>();
 
     public MultiSqlSessionFactoryBean() {
     }
