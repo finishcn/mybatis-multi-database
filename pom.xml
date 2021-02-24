@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.finish</groupId>
     <artifactId>mybatis-multi-database</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
     <name>mybatis-multi-database</name>
     <url>https://github.com/finishcn/mybatis-multi-database</url>
