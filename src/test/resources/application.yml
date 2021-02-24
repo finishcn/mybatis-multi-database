@@ -1,0 +1,20 @@
+jiami:
+  project: cray,mj,star,idiom,ddz,shake,monkey,roll,billiards,td,pxjm,monster
+spring:
+  multidatasource:
+    p1ds:
+      driver-class-name: com.mysql.jdbc.Driver
+      username: username
+      password: password
+      url: jdbc:mysql://ip:port/mainDatabase
+      # 多个xml目录用,分隔
+      mapper-locations: classpath*:mappers/p1/*.xml,classpath*:mappers/normal/*.xml
+      # 通过yml JSON格式{项目名: 数据库示例名}配置
+      apps: '{project1: database1,project2: database2}'
+    p2ds:
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      username: liyu
+      password: Yz3iHpFK
+      url: jdbc:sqlserver://ip:port;databaseName=mainDatabase
+      mapper-locations: classpath*:mappers/p2/*.xml
+      apps: '{project1: database1,project2: database2}'
