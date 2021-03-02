@@ -10,6 +10,7 @@ springboot mybatis多数据库（实例）配置扩展插件
 springboot自动配置方式
 
 spring:
+
   multidatasource:
     
     driver-class-name: com.mysql.jdbc.Driver
