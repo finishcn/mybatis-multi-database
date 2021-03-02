@@ -11,12 +11,12 @@ springboot自动配置方式
 
 spring:
   multidatasource:
-     driver-class-name: com.mysql.jdbc.Driver
-     username: root
-     password: mima123456
-     url: jdbc:mysql://127.0.0.1:3306/view?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false
-     mapper-locations: classpath*:mappers/data/*.xml,classpath*:mappers/multi/*.xml
-     apps: '{project1: database1,project2: database2,project3: database3}'
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: mima123456
+    url: jdbc:mysql://127.0.0.1:3306/view?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false
+    mapper-locations: classpath*:mappers/data/*.xml,classpath*:mappers/multi/*.xml
+    apps: '{project1: database1,project2: database2,project3: database3}'
 
 Mapper和XML类名需要以Multi为前缀，如MultiMapper.java、MultiMapper.xml
 不是以Multi为前缀的Mapper作为普通Mapper，不进行多数据库配置
