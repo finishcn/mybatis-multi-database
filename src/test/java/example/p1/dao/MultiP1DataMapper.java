@@ -1,10 +1,10 @@
-package com.example.p1.dao;
+package example.p1.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * Mapper和XML类名需要以Multi为前缀
- * 不带Multi前缀的Mapper被认为是普通Mapper，不进行多数据库实例配置
+ * Mapper鍜孹ML绫诲悕闇�瑕佷互Multi涓哄墠缂�
+ * 涓嶅甫Multi鍓嶇紑鐨凪apper琚涓烘槸鏅�歁apper锛屼笉杩涜澶氭暟鎹簱瀹炰緥閰嶇疆
  */
 @Mapper
 public interface MultiP1DataMapper {

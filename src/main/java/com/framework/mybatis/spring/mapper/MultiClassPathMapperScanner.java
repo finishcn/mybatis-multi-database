@@ -177,7 +177,7 @@ public class MultiClassPathMapperScanner extends ClassPathBeanDefinitionScanner 
     /**
      * 多实例配置
      */
-    private void processMultiBeanDefinitions(BeanDefinitionHolder baseholder) throws Exception {
+    private void processMultiBeanDefinitions(BeanDefinitionHolder baseholder) {
         String baseBeanName = baseholder.getBeanName();
         this.registry.removeBeanDefinition(baseBeanName);
         //移除基础bean定义
